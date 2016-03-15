@@ -30,6 +30,7 @@ def task(ctx, config):
           ec_pool: use an ec pool
           erasure_code_profile: profile to use with the erasure coded pool
           pool_snaps: use pool snapshots instead of selfmanaged snapshots
+          min_size: override the min_size property of the created pools
 	  write_fadvise_dontneed: write behavior like with LIBRADOS_OP_FLAG_FADVISE_DONTNEED.
 	                          This mean data don't access in the near future.
 				  Let osd backend don't keep data in cache.
@@ -225,6 +226,10 @@ def task(ctx, config):
                     if config.get('fast_read', False):
                         ctx.manager.raw_cluster_cmd(
                             'osd', 'pool', 'set', pool, 'fast_read', 'true')
+                    min_size = config.get('min_size', None)
+                    if min_size:
+                        ctx.manager.raw_cluster_cmd(
+                            'osd', 'pool', 'set', pool, 'min_size', min_size)
 
                 (remote,) = ctx.cluster.only(role).remotes.iterkeys()
                 proc = remote.run(
